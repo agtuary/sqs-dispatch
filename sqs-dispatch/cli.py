@@ -3,7 +3,7 @@ from aiobotocore.session import get_session
 import sys
 import botocore.exceptions
 from .worker import run_worker
-from .queue import enqueue
+from .queue import enqueue_message
 import click
 import logging
 
@@ -19,10 +19,13 @@ logger = logging.getLogger(__name__)
 @click.pass_context
 def cli(ctx, debug, queue):
     ctx.ensure_object(dict)
-    if debug:
-        logger.setLevel(logging.DEBUG)
     ctx.obj["DEBUG"] = debug
     ctx.obj["QUEUE"] = queue
+
+    print("Got", queue)
+
+    if debug:
+        logger.setLevel(logging.DEBUG)
 
 
 @cli.command()
@@ -34,16 +37,13 @@ def process(ctx):
 
 
 @cli.command()
-@click.argument("COMMAND", nargs=-1)
-@click.pass_context
-def enqueue(ctx, command):
-    queue = ctx.obj["QUEUE"]
-
-    async def run_enqueue():
-        await enqueue(queue, {"command": list(command)})
-
-    asyncio.run(run_enqueue())
-    logger.info("Enqueued %s", command)
+@click.argument("cmd", nargs=-1)
+@click.pass_obj
+def enqueue(obj, cmd):
+    queue = obj["QUEUE"]
+    message = {"command": list(cmd)}
+    asyncio.run(enqueue_message(queue, message))
+    logger.info("Enqueued %s", cmd)
 
 
 def main():

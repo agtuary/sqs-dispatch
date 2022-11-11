@@ -6,7 +6,7 @@ from typing import Callable
 logger = logging.getLogger(__name__)
 
 
-async def enqueue(queue_url: str, message: dict, region: str = "us-west-2"):
+async def enqueue_message(queue_url: str, message: dict, region: str = "us-west-2"):
     session = get_session()
     async with session.create_client("sqs", region_name=region) as client:
         await client.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
