@@ -17,4 +17,4 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-sqs-dispatch = "sqs-dispatch.cli:main"
+sqs-dispatch = "sqs_dispatch.cli:main"

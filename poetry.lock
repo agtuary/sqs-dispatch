@@ -98,7 +98,7 @@ crt = ["awscrt (==0.14.0)"]
 
 [[package]]
 name = "botocore-stubs"
-version = "1.29.7"
+version = "1.29.8"
 description = "Type annotations and code completion for botocore"
 category = "main"
 optional = false
@@ -771,8 +771,8 @@ botocore = [
     {file = "botocore-1.27.59.tar.gz", hash = "sha256:eda4aed6ee719a745d1288eaf1beb12f6f6448ad1fa12f159405db14ba9c92cf"},
 ]
 botocore-stubs = [
-    {file = "botocore_stubs-1.29.7-py3-none-any.whl", hash = "sha256:3eb097b6056c437c2f7ad80d0f4102c88f8d7b7819064e55c0ca73170c4b2d79"},
-    {file = "botocore_stubs-1.29.7.tar.gz", hash = "sha256:2b21185cfadf2210a627dd2425368ce1cc5eaa2a6a3d9b16a42a868d908b5772"},
+    {file = "botocore_stubs-1.29.8-py3-none-any.whl", hash = "sha256:d2864cae5f8e574aa5174af28a301120dec66f12d9a0943116d65caad56ba6d1"},
+    {file = "botocore_stubs-1.29.8.tar.gz", hash = "sha256:66e49ee1a524d954ce2b199fdc1c052d51379480934c197a34e441a6b2e8c717"},
 ]
 charset-normalizer = [
     {file = "charset-normalizer-2.1.1.tar.gz", hash = "sha256:5a3d016c7c547f69d6f81fb0db9449ce888b418b5b9952cc5e6e66843e9dd845"},
