@@ -1,10 +1,6 @@
 import asyncio
-import botocore.exceptions
 import click
 import logging
-import sys
-from aiobotocore.session import get_session
-
 from .queue import enqueue_message
 from .worker import run_worker
 
@@ -15,8 +11,10 @@ logger = logging.getLogger(__name__)
 
 
 @click.group()
-@click.option("--queue", help="SQS queue to listen to", required=True)
-@click.option("--debug/--no-debug", default=False)
+@click.option(
+    "--queue", help="SQS queue to listen to", required=True, envvar="QUEUE_NAME"
+)
+@click.option("--debug/--no-debug", default=False, envvar="DEBUG")
 @click.pass_context
 def cli(ctx, debug, queue):
     ctx.ensure_object(dict)
@@ -48,4 +46,4 @@ def enqueue(obj, cmd):
 
 
 def main():
-    cli(auto_envvar_prefix="SQS_DISPATCH")
+    cli()
