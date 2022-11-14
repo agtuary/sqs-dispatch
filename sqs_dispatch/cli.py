@@ -1,11 +1,12 @@
 import asyncio
-from aiobotocore.session import get_session
-import sys
 import botocore.exceptions
-from .worker import run_worker
-from .queue import enqueue_message
 import click
 import logging
+import sys
+from aiobotocore.session import get_session
+
+from .queue import enqueue_message
+from .worker import run_worker
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("boto").setLevel(logging.CRITICAL)

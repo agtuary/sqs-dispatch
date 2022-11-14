@@ -13,5 +13,9 @@ A very simple worker that executes commands from an SQS queue
 ## Run sqs-dispatch-worker
 
 ```bash
-$ python -m sqs-dispatch --queue $SQS_QUEUE_URL --region $AWS_REGION
+# To process messages from the queue
+$ python -m sqs-dispatch --queue $SQS_QUEUE_URL --process
+
+# To process messages from the queue
+$ python -m sqs-dispatch --queue $SQS_QUEUE_URL --enqueue "ENTER_COMMAND_HERE"
 ```

@@ -1,6 +1,6 @@
-from aiobotocore.session import get_session
-import logging
 import json
+import logging
+from aiobotocore.session import get_session
 from typing import Callable
 
 logger = logging.getLogger(__name__)

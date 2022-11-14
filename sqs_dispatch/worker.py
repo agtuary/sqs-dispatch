@@ -1,8 +1,9 @@
-from .queue import process_queue
-from .command import execute
 import click
-import logging
 import json
+import logging
+
+from .command import execute
+from .queue import process_queue
 
 
 async def run_worker(queue: str):
