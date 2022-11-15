@@ -24,10 +24,10 @@ def execute(command: str | List | Tuple, shell=True):
         command, stdout=PIPE, stderr=PIPE, shell=shell, universal_newlines=True
     )
     for stdout_line in iter(popen.stdout.readline, ""):
-        logger.info("[STDOUT] %s", stdout_line)
+        print(stdout_line)
         output += stdout_line
     for stderr_line in iter(popen.stderr.readline, ""):
-        logger.error("[STDERR] %s", stderr_line)
+        print(stderr_line)
         error += stderr_line
 
     popen.stdout.close()
