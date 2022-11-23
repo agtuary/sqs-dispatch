@@ -33,6 +33,6 @@ def execute(command: Union[str, List, Tuple], shell=True, env: Dict[str, str] = 
     popen.stdout.close()
     popen.stderr.close()
     return_code = popen.wait()
-    if return_code == 1:
+    if return_code > 0:
         raise CalledProcessError(return_code, command, output=output, stderr=error)
     return output
