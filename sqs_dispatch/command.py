@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import logging
 from subprocess import Popen, PIPE, CalledProcessError
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Union
 
 logger = logging.getLogger(__name__)
 
 
-def execute(command: str | List | Tuple, shell=True):
+def execute(command: Union[str, List, Tuple], shell=True, env: Dict[str, str] = {}):
     """
     Run a command in a subprocess.
     Args:
@@ -21,7 +21,7 @@ def execute(command: str | List | Tuple, shell=True):
     logger.info("Executing command %s", command)
     output, error = "", ""
     popen = Popen(
-        command, stdout=PIPE, stderr=PIPE, shell=shell, universal_newlines=True
+        command, stdout=PIPE, stderr=PIPE, shell=shell, universal_newlines=True, env=env
     )
     for stdout_line in iter(popen.stdout.readline, ""):
         print(stdout_line)

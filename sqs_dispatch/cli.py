@@ -21,8 +21,6 @@ def cli(ctx, debug, queue):
     ctx.obj["DEBUG"] = debug
     ctx.obj["QUEUE"] = queue
 
-    print("Got", queue)
-
     if debug:
         logger.setLevel(logging.DEBUG)
 

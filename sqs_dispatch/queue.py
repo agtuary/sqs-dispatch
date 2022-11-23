@@ -55,7 +55,7 @@ async def process_queue(queue_url: str, handler: Callable, region: str = "us-wes
                         msg["MessageId"],
                         parsed_msg,
                     )
-                    handler(parsed_msg)
+                    handler(msg["MessageId"], parsed_msg)
 
                     logger.info(
                         "[%s] Finished processing message (took %ds), deleting message from queue",
