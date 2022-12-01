@@ -29,7 +29,7 @@ async def execute(
     )
 
     while True:
-        print("[cmd] polling for data", flush=True)
+        # print("[cmd] polling for data", flush=True)
 
         if proc.stdout.at_eof() and proc.stderr.at_eof():
             print("[cmd] Subprocess exited", flush=True)
