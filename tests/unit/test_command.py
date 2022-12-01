@@ -6,7 +6,7 @@ import pytest
 async def test_retain_ordering():
     output = []
     await execute(
-        "echo stdout.1; >&2 echo strerr.1; echo stdout.2; >&2 echo strerr.2",
+        "echo stdout.1; sleep 0.5; >&2 echo strerr.1; sleep 0.5; echo stdout.2; sleep 0.5; >&2 echo strerr.2",
         callback=lambda x, y: output.append(y),
     )
 

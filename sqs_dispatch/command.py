@@ -22,37 +22,30 @@ async def execute(
     print(f"[cmd] executing {command}", flush=True)
 
     proc = await asyncio.create_subprocess_shell(
-        " ".join(command),
+        " ".join(command + ["2>&1"]),
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
         env={**os.environ, **env},
     )
 
-    while True:
-        # print("[cmd] polling for data", flush=True)
+    async def monitor_pipe(name: str, pipe: asyncio.StreamReader):
+        while True:
+            # print("[cmd] polling for data", flush=True)
 
-        if proc.stdout.at_eof() and proc.stderr.at_eof():
-            print("[cmd] Subprocess exited", flush=True)
-            break
+            if pipe.at_eof():
+                print(f"[{name}] PIPE CLOSED", flush=True)
+                return
 
-        stdout = (await proc.stdout.readline()).decode()
-        if stdout:
-            stdout = stdout.strip()
-            print(f"[out] {stdout}", flush=True)
-            if callback:
-                callback("out", stdout)
+            line = (await pipe.readline()).decode("ascii").rstrip()
+            if line:
+                print(f"[{name}] {line}", flush=True)
+                if callback:
+                    callback(name, line)
 
-        stderr = (await proc.stderr.readline()).decode()
-        if stderr:
-            stderr = stderr.strip()
-            print(f"[err] {stderr}", flush=True)
-            if callback:
-                callback("err", stderr)
-
-        if not stdout and not stderr:
-            print("[cmd] No output, waiting...", flush=True)
-            # Avoid rapidly checking if no output is available.
-            await asyncio.sleep(1)
+    await asyncio.gather(
+        asyncio.create_task(monitor_pipe("out", proc.stdout)),
+        asyncio.create_task(monitor_pipe("err", proc.stderr)),
+    )
 
     await proc.wait()
 
