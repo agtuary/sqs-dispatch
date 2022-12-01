@@ -38,3 +38,14 @@ async def test_array_string():
 
     assert len(output) == 1
     assert output[0] == "this is a test"
+
+
+@pytest.mark.asyncio
+async def test_long_stderr():
+    output = []
+    await execute(
+        [">&2 printf 'testing\n%.0s' {1..5}"],
+        callback=lambda x, y: output.append(y),
+    )
+
+    assert len(output) == 5

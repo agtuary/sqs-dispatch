@@ -28,27 +28,29 @@ async def execute(
 
     while True:
         if proc.stdout.at_eof() and proc.stderr.at_eof():
+            print("[cmd] Subprocess exited")
             break
 
         stdout = (await proc.stdout.readline()).decode()
         if stdout:
             stdout = stdout.strip()
-            print(f"[stdout] {stdout}", flush=True)
+            print(f"[out] {stdout}", flush=True)
             if callback:
                 callback("out", stdout)
 
         stderr = (await proc.stderr.readline()).decode()
         if stderr:
             stderr = stderr.strip()
-            print(f"[sdterr] {stderr}", flush=True)
+            print(f"[err] {stderr}", flush=True)
             if callback:
                 callback("err", stderr)
 
         if not stdout and not stderr:
+            print("[cmd] No output, waiting...")
             # Avoid rapidly checking if no output is available.
             await asyncio.sleep(1)
 
-    await proc.communicate()
+    await proc.wait()
 
     # Wait for the subprocess exit.
     if proc.returncode != 0:
