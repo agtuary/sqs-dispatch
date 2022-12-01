@@ -44,7 +44,9 @@ async def execute(
             if callback:
                 callback("err", stderr)
 
-        await asyncio.sleep(1)
+        if not stdout and not stderr:
+            # Avoid rapidly checking if no output is available.
+            await asyncio.sleep(1)
 
     await proc.communicate()
 
