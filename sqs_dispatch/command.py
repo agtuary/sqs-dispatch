@@ -19,6 +19,8 @@ async def execute(
 
     # Create the subprocess; redirect the standard output
     # into a pipe.
+    print(f"[cmd] executing {command}", flush=True)
+
     proc = await asyncio.create_subprocess_shell(
         " ".join(command),
         stdout=asyncio.subprocess.PIPE,
@@ -27,8 +29,10 @@ async def execute(
     )
 
     while True:
+        print("[cmd] polling for data", flush=True)
+
         if proc.stdout.at_eof() and proc.stderr.at_eof():
-            print("[cmd] Subprocess exited")
+            print("[cmd] Subprocess exited", flush=True)
             break
 
         stdout = (await proc.stdout.readline()).decode()
@@ -46,7 +50,7 @@ async def execute(
                 callback("err", stderr)
 
         if not stdout and not stderr:
-            print("[cmd] No output, waiting...")
+            print("[cmd] No output, waiting...", flush=True)
             # Avoid rapidly checking if no output is available.
             await asyncio.sleep(1)
 
