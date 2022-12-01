@@ -2,7 +2,7 @@ import json
 import os
 import logging
 from aiobotocore.session import get_session
-from typing import Callable
+from typing import Coroutine
 from pprint import pprint
 from time import time
 from traceback import print_exc
@@ -18,7 +18,7 @@ async def enqueue_message(queue_url: str, message: dict, region: str = "us-west-
         await client.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
 
 
-async def process_loop(queue_url: str, client, handler: Callable):
+async def process_loop(queue_url: str, client, handler: Coroutine):
     # This loop wont spin really fast as there is
     # essentially a sleep in the receive_message call
     response = await client.receive_message(
@@ -58,7 +58,7 @@ async def process_loop(queue_url: str, client, handler: Callable):
         )
 
         async with capture_metrics(metric_tags):
-            handler(msg["MessageId"], parsed_msg)
+            await handler(msg["MessageId"], parsed_msg)
 
         logger.info(
             "[%s] Finished processing message (took %ds), deleting message from queue",
@@ -80,7 +80,7 @@ async def process_loop(queue_url: str, client, handler: Callable):
         )
 
 
-async def process_queue(queue_url: str, handler: Callable, region: str = "us-west-2"):
+async def process_queue(queue_url: str, handler: Coroutine, region: str = "us-west-2"):
     session = get_session()
     async with session.create_client("sqs", region_name=region) as client:
         while True:
