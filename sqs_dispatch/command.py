@@ -36,7 +36,7 @@ async def execute(
                 print(f"[{name}] PIPE CLOSED", flush=True)
                 return
 
-            line = (await pipe.readline()).decode("ascii").rstrip()
+            line = (await pipe.readline()).decode("utf-8", errors="ignore").rstrip()
             if line:
                 print(f"[{name}] {line}", flush=True)
                 if callback:
