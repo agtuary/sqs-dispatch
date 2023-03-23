@@ -1,14 +1,16 @@
 import logging
-from time import time
-from datadog import initialize, api
 from contextlib import asynccontextmanager
+from datadog import initialize, api
+from time import time
 
 initialize(api_host="https://app.datadoghq.eu")
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("sqs_dispatch.metrics")
 
 
-async def send_finished_metrics(event, duration, metric_tags={}):
+async def send_finished_metrics(event, duration, metric_tags=None):
+    if metric_tags is None:
+        metric_tags = {}
     try:
         api.Metric.send(
             metrics=[

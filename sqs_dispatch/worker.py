@@ -1,12 +1,9 @@
-import click
-import json
 import logging
-import os
 
-from .command import execute
-from .queue import process_queue
+from sqs_dispatch.command import execute
+from sqs_dispatch.queue_ import process_queue
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("sqs_dispatch.worker")
 
 
 async def run_worker(queue: str):

@@ -1,25 +1,27 @@
 from __future__ import annotations
-import os
-import logging
-from subprocess import Popen, PIPE, CalledProcessError
-from typing import List, Tuple, Dict, Union, Callable, Optional
-import asyncio
 
-logger = logging.getLogger(__name__)
+import asyncio
+import logging
+import os
+from subprocess import Popen, PIPE, CalledProcessError
+from typing import List, Tuple, Union, Callable, Optional, Dict
+
+logger = logging.getLogger("sqs_dispatch.command")
 
 
 async def execute(
     command: Union[str, List[str]],
-    env: Dict[str, str] = {},
+    env: Optional[Dict[str, str]] = None,
     callback: Optional[Callable] = None,
 ):
-
+    if env is None:
+        env = {}
     if isinstance(command, str):
         command = [command]
 
     # Create the subprocess; redirect the standard output
     # into a pipe.
-    print(f"[cmd] executing {command}", flush=True)
+    logger.info(f"[cmd] executing {command}")
 
     proc = await asyncio.create_subprocess_shell(
         " ".join(command + ["2>&1"]),
@@ -59,7 +61,7 @@ async def execute(
 def execute_sync(
     command: Union[str, List, Tuple],
     shell=True,
-    env: Dict[str, str] = {},
+    env: Optional[Dict[str, str]] = None,
     callback: Optional[Callable] = None,
 ):
     """
@@ -68,9 +70,12 @@ def execute_sync(
         command: Command to run.
         shell: If true, the command will be executed through the shell. Defaults to True.
         env: key=value pairs of environment variables to pass through
+        callback: A callback function to call with the output of the command.
     Returns:
         The output of the command.
     """
+    if env is None:
+        env = {}
     if isinstance(command, (list, tuple)):
         command = " ".join(command)
     logger.info("Executing command %s", command)

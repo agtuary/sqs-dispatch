@@ -1,15 +1,17 @@
 import json
-import os
 import logging
-from aiobotocore.session import get_session
-from typing import Coroutine
-from pprint import pprint
+import sys
 from time import time
 from traceback import print_exc
-from .metrics import capture_metrics
-from datadog import initialize, api
+from typing import Awaitable, Callable, Any
 
-logger = logging.getLogger(__name__)
+import botocore.exceptions
+from aiobotocore.session import get_session
+
+from sqs_dispatch.metrics import capture_metrics
+
+logger = logging.getLogger("sqs_dispatch.queue")
+AsyncFunc = Callable[[Any, Any], Awaitable[Any]]
 
 
 async def enqueue_message(queue_url: str, message: dict):
@@ -18,8 +20,8 @@ async def enqueue_message(queue_url: str, message: dict):
         await client.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message))
 
 
-async def process_loop(queue_url: str, client, handler: Coroutine):
-    # This loop wont spin really fast as there is
+async def process_loop(queue_url: str, client, handler: AsyncFunc):
+    # This loop doesn't spin really fast as there is
     # essentially a sleep in the receive_message call
     response = await client.receive_message(
         QueueUrl=queue_url,
@@ -30,12 +32,11 @@ async def process_loop(queue_url: str, client, handler: Coroutine):
     start = time()
 
     if "Messages" not in response:
-        logger.debug("No messages in response, moving on")
+        logger.info("No messages in response, moving on")
         return
 
     msg = response["Messages"][0]
-    print("Received message:")
-    pprint(msg)
+    logger.info(f"Received message: {msg}")
 
     try:
         parsed_msg = json.loads(msg["Body"])
@@ -72,7 +73,7 @@ async def process_loop(queue_url: str, client, handler: Coroutine):
         )
     except Exception as e:
         print_exc()
-        logger.warn(
+        logger.warning(
             "Failed to process message %s because %s (took %ds), skipping",
             msg["MessageId"],
             e,
@@ -80,9 +81,23 @@ async def process_loop(queue_url: str, client, handler: Coroutine):
         )
 
 
-async def process_queue(queue_url: str, handler: Coroutine):
+async def process_queue(queue_name: str, handler: AsyncFunc):
     session = get_session()
     async with session.create_client("sqs") as client:
+        try:
+            response = await client.get_queue_url(QueueName=queue_name)
+        except botocore.exceptions.ClientError as err:
+            if (
+                err.response["Error"]["Code"]
+                == "AWS.SimpleQueueService.NonExistentQueue"
+            ):
+                logger.error(f"Queue {queue_name} does not exist")
+                sys.exit(1)
+            else:
+                raise
+
+        queue_url = response["QueueUrl"]
+        logger.info(f"Processing queue {queue_url}")
         while True:
             try:
                 await process_loop(queue_url, client, handler)

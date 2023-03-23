@@ -1,8 +1,10 @@
 import asyncio
-import click
 import logging
-from .queue import enqueue_message
-from .worker import run_worker
+
+import click
+
+from sqs_dispatch.queue_ import enqueue_message
+from sqs_dispatch.worker import run_worker
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("boto").setLevel(logging.CRITICAL)
@@ -12,9 +14,9 @@ logger = logging.getLogger(__name__)
 
 @click.group()
 @click.option(
-    "--queue", help="SQS queue to listen to", required=True, envvar="QUEUE_NAME"
+    "--queue", help="Name of SQS queue to listen to", required=True, envvar="QUEUE_NAME"
 )
-@click.option("--debug/--no-debug", default=False, envvar="DEBUG")
+@click.option("--debug/--no-debug", type=bool, default=False, envvar="DEBUG")
 @click.pass_context
 def cli(ctx, debug, queue):
     ctx.ensure_object(dict)
